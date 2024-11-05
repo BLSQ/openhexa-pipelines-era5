@@ -162,7 +162,7 @@ def read_boundaries(boundaries_dataset: Dataset) -> gpd.GeoDataFrame:
 def get_daily(
     input_dir: Path, boundaries: gpd.GeoDataFrame, variable: str, column_uid: str
 ) -> pl.DataFrame:
-    files = input_dir.glob("*.grib")
+    files = [f for f in input_dir.glob("*.grib")]
     if not files:
         msg = f"No GRIB files found in {input_dir}"
         current_run.log_error(msg)
