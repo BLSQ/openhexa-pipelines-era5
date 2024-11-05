@@ -1,4 +1,4 @@
-openhexa.toolbox>=1.4
+openhexa.toolbox>=1.4.1
 cfgrib
 xarray
 epiweeks

@@ -162,14 +162,18 @@ def read_boundaries(boundaries_dataset: Dataset) -> gpd.GeoDataFrame:
 def get_daily(
     input_dir: Path, boundaries: gpd.GeoDataFrame, variable: str, column_uid: str
 ) -> pl.DataFrame:
-    files = [f for f in input_dir.glob("*.grib")]
-    if not files:
+    fp = None
+    for f in input_dir.glob("*.grib"):
+        fp = f
+        break
+
+    if fp is None:
         msg = f"No GRIB files found in {input_dir}"
         current_run.log_error(msg)
         raise FileNotFoundError(msg)
 
     # get raster metadata from 1st grib file available
-    ds = xr.open_dataset(files[0])
+    ds = xr.open_dataset(fp, engine="cfgrib")
     ncols = len(ds.longitude)
     nrows = len(ds.latitude)
     transform = get_transform(ds)
