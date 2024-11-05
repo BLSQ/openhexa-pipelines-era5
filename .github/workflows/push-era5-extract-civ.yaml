@@ -3,7 +3,7 @@ name: Push era5-extract pipeline to CIV NMDR workspace
 on:
   push:
     paths:
-      - ".github/workflows/push-era5-extract-civ.yml"
+      - ".github/workflows/push-era5-extract-civ.yaml"
       - "era5_extract/**"
   workflow_dispatch:
 
