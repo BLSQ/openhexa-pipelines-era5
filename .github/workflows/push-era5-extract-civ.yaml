@@ -1,0 +1,31 @@
+name: Push era5-extract pipeline to CIV NMDR workspace
+
+on:
+  push:
+    paths:
+      - ".github/workflows/push-era5-extract-civ.yml"
+      - "era5-extract/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+
+      - name: Configure OpenHEXA CLI
+        uses: blsq/openhexa-cli-action@v1
+        with:
+          workspace: "civ-data-integration-3cfb03"
+          token: ${{ secrets.OH_TOKEN_CIV }}
+      - name: Push pipeline to OpenHEXA
+        run: |
+          openhexa pipelines push era5_extract \
+            -n ${{ github.sha }} \
+            -l "https://github.com/BLSQ/openhexa-pipelines-era5/commit/${{ github.sha }}" \
+            --yes
