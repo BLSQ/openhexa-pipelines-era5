@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/push-era5-extract-civ.yml"
-      - "era5-extract/**"
+      - "era5_extract/**"
   workflow_dispatch:
 
 jobs:
