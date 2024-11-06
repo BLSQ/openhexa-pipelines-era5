@@ -192,7 +192,7 @@ def get_daily(
     # build binary raster masks for each boundary geometry for spatial aggregation
     masks = build_masks(boundaries, nrows, ncols, transform)
 
-    var = VARIABLES[variable]["short_name"]
+    var = VARIABLES[variable]["shortname"]
 
     daily = aggregate(ds=ds, var=var, masks=masks, boundaries_id=boundaries[column_uid])
 
