@@ -59,7 +59,7 @@ def era5_aggregate(
 
     # subdirs containing raw data are named after variable names
     subdirs = [d for d in input_dir.iterdir() if d.is_dir()]
-    variables = [d for d in subdirs if d.name in VARIABLES.keys()]
+    variables = [d.name for d in subdirs if d.name in VARIABLES.keys()]
 
     if not variables:
         msg = "No variables found in input directory"
