@@ -15,7 +15,7 @@ from openhexa.sdk import (
 from openhexa.toolbox.era5.cds import VARIABLES, Client
 
 
-@pipeline("__pipeline_id__", name="ERA5 Temperature Extract")
+@pipeline("__pipeline_id__", name="ERA5 Extract")
 @parameter(
     "start_date",
     type=str,
