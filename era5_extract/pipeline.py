@@ -45,28 +45,11 @@ from openhexa.toolbox.era5.cds import VARIABLES, Client
     required=True,
 )
 @parameter(
-    "download_2m_temperature",
-    name="2m temperature",
-    type=bool,
-    help="Download 2m temperature data",
-    required=True,
-    default=True,
-)
-@parameter(
-    "download_precipitation",
-    name="Total precipitation",
-    type=bool,
-    help="Download total precipitation data",
-    required=True,
-    default=True,
-)
-@parameter(
-    "download_swvl1",
-    name="Soil volumetric layer",
-    type=bool,
-    help="Download soil volumetric layer 1 data",
-    required=True,
-    default=False,
+    "variable",
+    name="Variable",
+    type=str,
+    choices=sorted([var["name"] for var in VARIABLES.values()]),
+    help="ERA5-Land variable of interest",
 )
 @parameter(
     "output_dir",
@@ -81,30 +64,16 @@ def era5_extract(
     end_date: str,
     cds_connection: CustomConnection,
     boundaries_dataset: Dataset,
-    download_2m_temperature: bool,
-    download_precipitation: bool,
-    download_swvl1: bool,
+    variable: str,
     output_dir: str,
-):
+) -> None:
+    """Download ERA5 products from the Climate Data Store."""
     cds = Client(cds_connection.key)
     current_run.log_info("Successfully connected to the Climate Data Store")
 
     boundaries = read_boundaries(boundaries_dataset)
     bounds = get_bounds(boundaries)
-    current_run.log_info(f"Using area of interest: {str(bounds)}")
-
-    variables = []
-    if download_2m_temperature:
-        variables.append("2m_temperature")
-    if download_precipitation:
-        variables.append("total_precipitation")
-    if download_swvl1:
-        variables.append("volumetric_soil_water_layer_1")
-
-    if not variables:
-        msg = "No variables selected for download"
-        current_run.log_error(msg)
-        raise ValueError(msg)
+    current_run.log_info(f"Using area of interest: {bounds}")
 
     if not end_date:
         end_date = datetime.now().astimezone(timezone.utc).strftime("%Y-%m-%d")
@@ -113,15 +82,26 @@ def era5_extract(
     output_dir = Path(workspace.files_path, output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    for variable in variables:
-        download(
-            client=cds,
-            variable=variable,
-            start=start_date,
-            end=end_date,
-            output_dir=output_dir,
-            area=bounds,
-        )
+    var_code = None
+    var_shortname = None
+    for code, meta in VARIABLES.items():
+        if meta["name"] == variable:
+            var_code = code
+            var_shortname = meta["shortname"]
+            break
+    if var_code is None or var_shortname is None:
+        msg = f"Variable {variable} not supported"
+        current_run.log_error(msg)
+        raise ValueError(msg)
+
+    download(
+        client=cds,
+        variable=var_code,
+        start=start_date,
+        end=end_date,
+        output_dir=output_dir,
+        area=bounds,
+    )
 
 
 def read_boundaries(boundaries_dataset: Dataset) -> gpd.GeoDataFrame:
