@@ -107,7 +107,7 @@ def era5_extract(
         raise ValueError(msg)
 
     if not end_date:
-        end_date = datetime.now().strftime("%Y-%m-%d")
+        end_date = datetime.now().astimezone(timezone.utc).strftime("%Y-%m-%d")
         current_run.log_info(f"End date set to {end_date}")
 
     output_dir = Path(workspace.files_path, output_dir)
