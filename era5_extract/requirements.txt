@@ -1,1 +1,1 @@
-openhexa.toolbox>=1.2
+openhexa.toolbox @ git+https://github.com/BLSQ/openhexa-toolbox@main
