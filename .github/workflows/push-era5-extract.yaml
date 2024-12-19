@@ -12,15 +12,15 @@ jobs:
     strategy:
       matrix:
         pipeline: [
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_temperature", "token": '${{ secrets.OH_TOKEN_CIV }}'},
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_precipitation", "token": '${{ secrets.OH_TOKEN_CIV }}'},
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_humidity", "token": '${{ secrets.OH_TOKEN_CIV }}'},
-          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_temperature", "token": '${{ secrets.OH_TOKEN_BFA }}'},
-          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_precipitation", "token": '${{ secrets.OH_TOKEN_BFA }}'},
-          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_humidity", "token": '${{ secrets.OH_TOKEN_BFA }}'},
-          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_temperature", "token": '${{ secrets.OH_TOKEN_NER }}'},
-          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_precipitation", "token": '${{ secrets.OH_TOKEN_NER }}'},
-          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_humidity", "token": '${{ secrets.OH_TOKEN_NER }}'}
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_CIV},
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_CIV},
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_CIV},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_BFA},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_BFA},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_BFA},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_NER},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_NER},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_NER}
         ]
 
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
         uses: blsq/openhexa-cli-action@v1
         with:
           workspace: ${{ matrix.pipeline.workspace }}
-          token: ${{ matrix.pipeline.token }}
+          token: ${{ secrets[matrix.pipeline.token] }}
 
       - name: Push pipeline to OpenHEXA
         run: |
