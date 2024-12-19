@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 from math import ceil
 from pathlib import Path
@@ -211,8 +211,8 @@ def download(
         current_run.log_error(msg)
         raise ValueError(msg)
 
-    start = datetime.strptime(start, "%Y-%m-%d")
-    end = datetime.strptime(end, "%Y-%m-%d")
+    start = datetime.strptime(start, "%Y-%m-%d").astimezone(timezone.utc)
+    end = datetime.strptime(end, "%Y-%m-%d").astimezone(timezone.utc)
 
     dst_dir = output_dir / variable
     dst_dir.mkdir(parents=True, exist_ok=True)
