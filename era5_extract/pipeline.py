@@ -48,7 +48,13 @@ from openhexa.toolbox.era5.cds import VARIABLES, Client
     "variable",
     name="Variable",
     type=str,
-    choices=sorted([var["name"] for var in VARIABLES.values()]),
+    choices=[
+        "10 metre U wind component",
+        "10 metre V wind component",
+        "2 metre temperature",
+        "Total precipitation",
+        "Volumetric soil water layer 11",
+    ],
     help="ERA5-Land variable of interest",
 )
 @parameter(
@@ -162,7 +168,7 @@ def download(
     end: str,
     output_dir: Path,
     area: tuple[float],
-):
+) -> None:
     """Download ERA5 products from the Climate Data Store.
 
     Parameters
