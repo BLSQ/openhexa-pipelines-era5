@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timezone
 from io import BytesIO
 from math import ceil
@@ -12,7 +14,7 @@ from openhexa.sdk import (
     pipeline,
     workspace,
 )
-from openhexa.toolbox.era5.cds import VARIABLES, Client
+from openhexa.toolbox.era5.cds import CDS, VARIABLES
 
 
 @pipeline("__pipeline_id__", name="ERA5 Extract")
@@ -65,6 +67,14 @@ from openhexa.toolbox.era5.cds import VARIABLES, Client
     required=True,
     default="data/era5/raw",
 )
+@parameter(
+    "time",
+    name="Time",
+    type=int,
+    multiple=True,
+    required=False,
+    help="Hours of interest as integers (between 0 and 23). Set to all hours if empty.",
+)
 def era5_extract(
     start_date: str,
     end_date: str,
@@ -72,9 +82,10 @@ def era5_extract(
     boundaries_dataset: Dataset,
     variable: str,
     output_dir: str,
+    time: list[int] | None = None,
 ) -> None:
     """Download ERA5 products from the Climate Data Store."""
-    cds = Client(cds_connection.key)
+    cds = CDS(key=cds_connection.key)
     current_run.log_info("Successfully connected to the Climate Data Store")
 
     boundaries = read_boundaries(boundaries_dataset)
@@ -107,6 +118,7 @@ def era5_extract(
         end=end_date,
         output_dir=output_dir,
         area=bounds,
+        time=time,
     )
 
 
@@ -162,18 +174,19 @@ def get_bounds(boundaries: gpd.GeoDataFrame) -> tuple[int]:
 
 
 def download(
-    client: Client,
+    client: CDS,
     variable: str,
     start: str,
     end: str,
     output_dir: Path,
     area: tuple[float],
+    time: list[int] | None = None,
 ) -> None:
     """Download ERA5 products from the Climate Data Store.
 
     Parameters
     ----------
-    client : Client
+    client : CDS
         CDS client object
     variable : str
         ERA5 product variable (ex: "2m_temperature", "total_precipitation")
@@ -186,6 +199,8 @@ def download(
         created)
     area : tuple[float]
         Bounding box coordinates in the order (ymax, xmin, ymin, xmax)
+    time : list[int] | None, optional
+        Hours of interest as integers (between 0 and 23). Set to all hours if None.
 
     Raise
     -----
@@ -204,12 +219,7 @@ def download(
     dst_dir.mkdir(parents=True, exist_ok=True)
 
     client.download_between(
-        variable=variable,
-        start=start,
-        end=end,
-        dst_dir=dst_dir,
-        area=area,
-        overwrite=False,
+        variable=variable, start=start, end=end, dst_dir=dst_dir, area=area, time=time
     )
 
     current_run.log_info(f"Downloaded raw data for variable `{variable}`")
