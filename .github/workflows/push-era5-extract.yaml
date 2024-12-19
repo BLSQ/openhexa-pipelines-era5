@@ -1,0 +1,48 @@
+name: Push era5-extract pipelines to workspaces
+
+on:
+  push:
+    paths:
+      - ".github/workflows/push-era5-extract.yaml"
+      - "era5_extract/**"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        pipeline: [
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_temperature", "token": '${{ secrets.OH_TOKEN_CIV }}'},
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_precipitation", "token": '${{ secrets.OH_TOKEN_CIV }}'}
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_humidity", "token": '${{ secrets.OH_TOKEN_CIV }}'}
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_temperature", "token": '${{ secrets.OH_TOKEN_BFA }}'}
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_precipitation", "token": '${{ secrets.OH_TOKEN_BFA }}'}
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_humidity", "token": '${{ secrets.OH_TOKEN_BFA }}'}
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_temperature", "token": '${{ secrets.OH_TOKEN_NER }}'}
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_precipitation", "token": '${{ secrets.OH_TOKEN_NER }}'}
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_humidity", "token": '${{ secrets.OH_TOKEN_NER }}'}
+        ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+
+      - name: Configure OpenHEXA CLI
+        uses: blsq/openhexa-cli-action@v1
+        with:
+          workspace: ${{ matrix.pipeline.workspace }}
+          token: ${{ matrix.pipeline.token }}
+
+      - name: Push pipeline to OpenHEXA
+        run: |
+          sed -i "s/__pipeline_id__/${{ matrix.pipeline.pipeline_id }}/g" era5_extract/pipeline.py  
+          openhexa pipelines push era5_extract \
+            -n ${{ github.sha }} \
+            -l "https://github.com/BLSQ/openhexa-pipelines-era5/commit/${{ github.sha }}" \
+            --yes
