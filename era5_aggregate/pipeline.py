@@ -5,6 +5,7 @@ import geopandas as gpd
 import polars as pl
 import xarray as xr
 from openhexa.sdk import Dataset, current_run, parameter, pipeline, workspace
+from openhexa.sdk.datasets import DatasetFile
 from openhexa.toolbox.era5.aggregate import (
     aggregate,
     aggregate_per_month,
@@ -39,23 +40,32 @@ from openhexa.toolbox.era5.cds import VARIABLES
     required=True,
 )
 @parameter(
+    "boundaries_file",
+    name="Boundaries filename in dataset",
+    type=str,
+    help="Filename of the boundaries file to use in the boundaries dataset",
+    required=False,
+    default="district.parquet",
+)
+@parameter(
     "boundaries_column_uid",
     name="Boundaries column UID",
     type=str,
     help="Column name containing unique identifier for boundaries geometries",
     required=True,
-    default="district_id",
+    default="id",
 )
 def era5_aggregate(
     input_dir: str,
     output_dir: str,
     boundaries_dataset: Dataset,
     boundaries_column_uid: str,
+    boundaries_file: str | None = None,
 ):
     input_dir = Path(workspace.files_path, input_dir)
     output_dir = Path(workspace.files_path, output_dir)
 
-    boundaries = read_boundaries(boundaries_dataset)
+    boundaries = read_boundaries(boundaries_dataset, filename=boundaries_file)
 
     # subdirs containing raw data are named after variable names
     subdirs = [d for d in input_dir.iterdir() if d.is_dir()]
@@ -137,13 +147,18 @@ def era5_aggregate(
         )
 
 
-def read_boundaries(boundaries_dataset: Dataset) -> gpd.GeoDataFrame:
+def read_boundaries(
+    boundaries_dataset: Dataset, filename: str | None = None
+) -> gpd.GeoDataFrame:
     """Read boundaries geographic file from input dataset.
 
     Parameters
     ----------
     boundaries_dataset : Dataset
         Input dataset containing a "*district*.parquet" geoparquet file
+    filename : str
+        Filename of the boundaries file to read if there are several.
+        If set to None, the 1st parquet file found will be loaded.
 
     Return
     ------
@@ -155,16 +170,25 @@ def read_boundaries(boundaries_dataset: Dataset) -> gpd.GeoDataFrame:
     FileNotFoundError
         If the boundaries file is not found
     """
-    boundaries: gpd.GeoDataFrame = None
     ds = boundaries_dataset.latest_version
+
+    ds_file: DatasetFile | None = None
     for f in ds.files:
-        if f.filename.endswith(".parquet") and "district" in f.filename:
-            boundaries = gpd.read_parquet(BytesIO(f.read()))
-    if boundaries is None:
-        msg = "Boundaries file not found"
+        if f.filename == filename:
+            if f.filename.endswith(".parquet"):
+                ds_file = f
+            if f.filename.endswith(".geojson") or f.filename.endswith(".gpkg"):
+                ds_file = f
+
+    if ds_file is None:
+        msg = f"File {filename} not found in dataset {ds.name}"
         current_run.log_error(msg)
         raise FileNotFoundError(msg)
-    return boundaries
+
+    if ds_file.filename.endswith(".parquet"):
+        return gpd.read_parquet(BytesIO(ds_file.read()))
+
+    return gpd.read_file(BytesIO(ds_file.read()))
 
 
 def get_daily(
