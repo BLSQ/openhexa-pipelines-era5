@@ -1,4 +1,4 @@
-openhexa.toolbox>=1.4.1
+openhexa.toolbox @ git+https://github.com/BLSQ/openhexa-toolbox@main
 cfgrib
 xarray
 epiweeks
