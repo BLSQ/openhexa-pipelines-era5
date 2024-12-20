@@ -17,7 +17,7 @@ from openhexa.toolbox.era5.aggregate import (
 from openhexa.toolbox.era5.cds import VARIABLES
 
 
-@pipeline("era5_aggregate", name="ERA5 Aggregate")
+@pipeline("__pipeline_id__", name="ERA5 Aggregate")
 @parameter(
     "input_dir",
     type=str,

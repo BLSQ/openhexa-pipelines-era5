@@ -1,0 +1,42 @@
+name: Push era5-aggregate pipelines to workspaces
+
+on:
+  push:
+    paths:
+      - ".github/workflows/push-era5-aggregate.yaml"
+      - "era5_aggregate/**"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        pipeline: [
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_CIV},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_BFA},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_NER},
+        ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+
+      - name: Configure OpenHEXA CLI
+        uses: blsq/openhexa-cli-action@v1
+        with:
+          workspace: ${{ matrix.pipeline.workspace }}
+          token: ${{ secrets[matrix.pipeline.token] }}
+
+      - name: Push pipeline to OpenHEXA
+        run: |
+          sed -i "s/__pipeline_id__/${{ matrix.pipeline.pipeline_id }}/g" era5_aggregate/pipeline.py && \
+          openhexa pipelines push era5_aggregate \
+            -n ${{ github.sha }} \
+            -l "https://github.com/BLSQ/openhexa-pipelines-era5/commit/${{ github.sha }}" \
+            --yes
