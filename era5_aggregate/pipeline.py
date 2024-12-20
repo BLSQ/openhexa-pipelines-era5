@@ -1,5 +1,7 @@
+import tempfile
 from io import BytesIO
 from pathlib import Path
+from shutil import copytree
 
 import geopandas as gpd
 import polars as pl
@@ -211,14 +213,19 @@ def get_daily(
     transform = get_transform(ds)
 
     # build xarray dataset by merging all available grib files across the time dimension
-    ds = merge(input_dir)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_dir_tmp = Path(tmpdir, "data")
+        copytree(input_dir.as_posix(), input_dir_tmp.as_posix())
+        ds = merge(input_dir_tmp)
 
-    # build binary raster masks for each boundary geometry for spatial aggregation
-    masks = build_masks(boundaries, nrows, ncols, transform)
+        # build binary raster masks for each boundary geometry for spatial aggregation
+        masks = build_masks(boundaries, nrows, ncols, transform)
 
-    var = VARIABLES[variable]["shortname"]
+        var = VARIABLES[variable]["shortname"]
 
-    daily = aggregate(ds=ds, var=var, masks=masks, boundaries_id=boundaries[column_uid])
+        daily = aggregate(
+            ds=ds, var=var, masks=masks, boundaries_id=boundaries[column_uid]
+        )
 
     # kelvin to celsius
     if variable == "2m_temperature":
