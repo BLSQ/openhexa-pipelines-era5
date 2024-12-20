@@ -222,11 +222,23 @@ def get_daily(
 
     # kelvin to celsius
     if variable == "2m_temperature":
-        daily = daily - 273.15
+        daily = daily.with_columns(
+            [
+                pl.col("mean") - 273.15,
+                pl.col("min") - 273.15,
+                pl.col("max") - 273.15,
+            ]
+        )
 
     # m to mm
     if variable == "total_precipitation":
-        daily = daily * 1000
+        daily = daily.with_columns(
+            [
+                pl.col("mean") * 1000,
+                pl.col("min") * 1000,
+                pl.col("max") * 1000,
+            ]
+        )
 
     return daily
 
