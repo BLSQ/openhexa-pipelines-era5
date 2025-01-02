@@ -128,22 +128,22 @@ def era5_aggregate(
         dst_dir = output_dir / variable
         dst_dir.mkdir(parents=True, exist_ok=True)
 
-        daily.to_parquet(dst_dir / f"{variable}_daily.parquet")
+        daily.write_parquet(dst_dir / f"{variable}_daily.parquet")
         current_run.add_file_output(
             Path(dst_dir, f"{variable}_daily.parquet").as_posix()
         )
 
-        weekly.to_parquet(dst_dir / f"{variable}_weekly.parquet")
+        weekly.write_parquet(dst_dir / f"{variable}_weekly.parquet")
         current_run.add_file_output(
             Path(dst_dir, f"{variable}_weekly.parquet").as_posix()
         )
 
-        epi_weekly.to_parquet(dst_dir / f"{variable}_epi_weekly.parquet")
+        epi_weekly.write_parquet(dst_dir / f"{variable}_epi_weekly.parquet")
         current_run.add_file_output(
             Path(dst_dir, f"{variable}_epi_weekly.parquet").as_posix()
         )
 
-        monthly.to_parquet(dst_dir / f"{variable}_monthly.parquet")
+        monthly.write_parquet(dst_dir / f"{variable}_monthly.parquet")
         current_run.add_file_output(
             Path(dst_dir, f"{variable}_monthly.parquet").as_posix()
         )
