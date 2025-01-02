@@ -95,7 +95,7 @@ def era5_aggregate(
 
         weekly = aggregate_per_week(
             daily=daily,
-            column_uid=boundaries_column_uid,
+            column_uid="boundary_id",
             use_epidemiological_weeks=False,
             sum_aggregation=sum_aggregation,
         )
@@ -106,7 +106,7 @@ def era5_aggregate(
 
         epi_weekly = aggregate_per_week(
             daily=daily,
-            column_uid=boundaries_column_uid,
+            column_uid="boundary_id",
             use_epidemiological_weeks=True,
             sum_aggregation=sum_aggregation,
         )
@@ -117,7 +117,7 @@ def era5_aggregate(
 
         monthly = aggregate_per_month(
             daily=daily,
-            column_uid=boundaries_column_uid,
+            column_uid="boundary_id",
             sum_aggregation=sum_aggregation,
         )
 
@@ -248,37 +248,3 @@ def get_daily(
         )
 
     return daily
-
-
-def temporal_aggregation(
-    daily: xr.Dataset, column_uid: str, variable: str, frequency: str = "weekly"
-) -> pl.DataFrame:
-    if variable == "total_precipitation":
-        sum_aggregation = True
-    else:
-        sum_aggregation = False
-
-    if frequency == "weekly":
-        df = aggregate_per_week(
-            daily=daily,
-            column_uid=column_uid,
-            use_epidemiological_weeks=False,
-            sum_aggregation=sum_aggregation,
-        )
-    elif frequency == "epi_weekly":
-        df = aggregate_per_week(
-            daily=daily,
-            column_uid=column_uid,
-            use_epidemiological_weeks=True,
-            sum_aggregation=sum_aggregation,
-        )
-    elif frequency == "monthly":
-        df = aggregate_per_month(
-            daily=daily, column_uid=column_uid, sum_aggregation=sum_aggregation
-        )
-    else:
-        msg = f"Unsupported frequency: {frequency}"
-        current_run.log_error(msg)
-        raise ValueError(msg)
-
-    return df
