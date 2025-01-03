@@ -52,6 +52,25 @@ Example run in the OpenHEXA UI:
 
 ![Example run](docs/images/example_run.png)
 
+## Input files
+
+The pipeline expects Parquet files organized by variable and frequency. For example:
+
+```text
+data/era5/aggregate/
+├── 2m_temperature/
+│   ├── 2m_temperature_weekly.parquet
+│   └── 2m_temperature_monthly.parquet
+├── total_precipitation/
+│   ├── total_precipitation_weekly.parquet
+│   └── total_precipitation_monthly.parquet
+└── volumetric_soil_water_layer_1/
+    ├── volumetric_soil_water_layer_1_weekly.parquet
+    └── volumetric_soil_water_layer_1_monthly.parquet
+```
+
+An error will be raised if the input file cannot be found for a given variable and frequency.
+
 ## Flow
 
 ```mermaid
