@@ -16,9 +16,11 @@ Pipelines documentation is available in the respective subdirectories.
 ## Flow
 
 ```mermaid
-graph LR
-  B["**ERA5 Extract**"] --> D[/"Gridded hourly data<br>(GRIB2)"/]
+graph TB
+  A[(Climate Data Store)] --> B
+  B["**ERA5 Extract**"] --> D[/"Gridded hourly data (GRIB2)"/]
   D --> E["**ERA5 Aggregate**"]
-  E --> F[/"Aggregated data files<br>(Parquet)"/]
+  E --> F[/"Aggregated data files (Parquet)"/]
   F --> G["**ERA5 Import DHIS2**"]
+  G --> H[("DHIS2")]
 ```
