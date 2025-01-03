@@ -12,3 +12,13 @@ Three DAGs are available:
 * [`era5_import_dhis2`](era5_import_dhis2/README.md): import ERA5 aggregated climate statistics into DHIS2 datasets
 
 Pipelines documentation is available in the respective subdirectories.
+
+## Flow
+
+```mermaid
+graph LR
+  B["**ERA5 Extract**"] --> D[/"Gridded hourly data<br>(GRIB2)"/]
+  D --> E["**ERA5 Aggregate**"]
+  E --> F[/"Aggregated data files<br>(Parquet)"/]
+  F --> G["**ERA5 Import DHIS2**"]
+```
