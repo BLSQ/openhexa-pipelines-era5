@@ -15,7 +15,7 @@ Pipelines documentation is available in the respective subdirectories.
 
 ## Deployment
 
-To deploy the pipelines to an OpenHEXA workspace, edit the `.github/workflows/<pipeline_name>.yml` file accordingly.
+To deploy the pipelines to an OpenHEXA workspace, edit the `.github/workflows/<pipeline_name>.yml` file accordingly. The OpenHEXA workspace token must be stored in a GitHub Actions secret in the repository settings.
 
 In the following example, the `era5_extract` pipeline is automatically deployed 3 times (once per climate variable) to 3 different workspaces:
 
