@@ -13,6 +13,32 @@ Three DAGs are available:
 
 Pipelines documentation is available in the respective subdirectories.
 
+## Deployment
+
+To deploy the pipelines to an OpenHEXA workspace, edit the `.github/workflows/<pipeline_name>.yml` file accordingly.
+
+In the following example, the `era5_extract` pipeline is automatically deployed 3 times (once per climate variable) to 3 different workspaces:
+
+```yaml
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        pipeline: [
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_CIV},
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_CIV},
+          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_CIV},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_BFA},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_BFA},
+          {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_BFA},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_NER},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_NER},
+          {"workspace": "niger-nmdr", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_NER}
+        ]
+```
+
+New pipeline versions will be automatically deployed to the workspaces listed in the job matrix after each push to the `main` branch.
+
 ## Flow
 
 ```mermaid
