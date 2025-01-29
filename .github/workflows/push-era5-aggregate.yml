@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         pipeline: [
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_CIV},
+          {"workspace": "nmdr-civ", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_CIV},
           {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_BFA},
           {"workspace": "niger-nmdr", "pipeline_id": "era5_aggregate", "token": OH_TOKEN_NER},
         ]

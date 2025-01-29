@@ -12,9 +12,9 @@ jobs:
     strategy:
       matrix:
         pipeline: [
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_CIV},
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_CIV},
-          {"workspace": "civ-data-integration-3cfb03", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_CIV},
+          {"workspace": "nmdr-civ", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_CIV},
+          {"workspace": "nmdr-civ", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_CIV},
+          {"workspace": "nmdr-civ", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_CIV},
           {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_temperature", "token": OH_TOKEN_BFA},
           {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_precipitation", "token": OH_TOKEN_BFA},
           {"workspace": "bfa-malaria-data-reposi-b1b366", "pipeline_id": "era5_extract_humidity", "token": OH_TOKEN_BFA},
