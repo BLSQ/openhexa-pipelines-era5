@@ -1,7 +1,8 @@
 import tempfile
+import zipfile
 from io import BytesIO
 from pathlib import Path
-from shutil import copytree
+from shutil import copyfile, copytree
 
 import geopandas as gpd
 import polars as pl
@@ -214,9 +215,20 @@ def get_daily(
 
     # build xarray dataset by merging all available grib files across the time dimension
     with tempfile.TemporaryDirectory() as tmpdir:
-        input_dir_tmp = Path(tmpdir, "data")
-        copytree(input_dir.as_posix(), input_dir_tmp.as_posix())
-        ds = merge(input_dir_tmp)
+        for file in input_dir.glob("*.grib"):
+            # if the .grib file is actually a zip file, extract the data.grib file
+            # and copy its content instead with same filename
+            if zipfile.is_zipfile(file):
+                with zipfile.ZipFile(file.as_posix(), "r") as zip:
+                    bytes = zip.read("data.grib")
+                with open(Path(tmpdir, file.name), "wb") as f:
+                    f.write(bytes)
+
+            # if it's not a zip file, copy the grib file directly
+            else:
+                copyfile(src=file.as_posix(), dst=Path(tmpdir, file.name).as_posix())
+
+        ds = merge(Path(tmpdir))
 
         # build binary raster masks for each boundary geometry for spatial aggregation
         masks = build_masks(boundaries, nrows, ncols, transform)
