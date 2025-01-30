@@ -76,14 +76,6 @@ from openhexa.toolbox.era5.cds import CDS, VARIABLES
     required=True,
     default="data/era5/raw",
 )
-@parameter(
-    "time",
-    name="Time",
-    type=int,
-    multiple=True,
-    required=False,
-    help="Hours of interest as integers (between 0 and 23). Set to all hours if empty.",
-)
 def era5_extract(
     start_date: str,
     end_date: str,
@@ -92,7 +84,6 @@ def era5_extract(
     variable: str,
     output_dir: str,
     boundaries_file: str | None = None,
-    time: list[int] | None = None,
 ) -> None:
     """Download ERA5 products from the Climate Data Store."""
     cds = CDS(key=cds_connection.key)
@@ -109,6 +100,7 @@ def era5_extract(
     output_dir = Path(workspace.files_path, output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # find variable code and shortname from fullname provided in parameters
     var_code = None
     var_shortname = None
     for code, meta in VARIABLES.items():
@@ -121,6 +113,13 @@ def era5_extract(
         current_run.log_error(msg)
         raise ValueError(msg)
 
+    # default hours to download depending on climate variable
+    time = {
+        "2m_temperature": [0, 6, 12, 18],
+        "total_precipitation": [23],
+        "volumetric_soil_water_layer_1": [0, 6, 12, 18],
+    }
+
     download(
         client=cds,
         variable=var_code,
@@ -128,7 +127,7 @@ def era5_extract(
         end=end_date,
         output_dir=output_dir,
         area=bounds,
-        time=time,
+        time=time.get(var_code, [0, 6, 12, 18]),
     )
 
 
