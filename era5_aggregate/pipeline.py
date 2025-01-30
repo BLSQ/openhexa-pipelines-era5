@@ -197,22 +197,6 @@ def read_boundaries(
 def get_daily(
     input_dir: Path, boundaries: gpd.GeoDataFrame, variable: str, column_uid: str
 ) -> pl.DataFrame:
-    fp = None
-    for f in input_dir.glob("*.grib"):
-        fp = f
-        break
-
-    if fp is None:
-        msg = f"No GRIB files found in {input_dir}"
-        current_run.log_error(msg)
-        raise FileNotFoundError(msg)
-
-    # get raster metadata from 1st grib file available
-    ds = xr.open_dataset(fp, engine="cfgrib")
-    ncols = len(ds.longitude)
-    nrows = len(ds.latitude)
-    transform = get_transform(ds)
-
     # build xarray dataset by merging all available grib files across the time dimension
     with tempfile.TemporaryDirectory() as tmpdir:
         for file in input_dir.glob("*.grib"):
@@ -229,6 +213,9 @@ def get_daily(
                 copyfile(src=file.as_posix(), dst=Path(tmpdir, file.name).as_posix())
 
         ds = merge(Path(tmpdir))
+        ncols = len(ds.longitude)
+        nrows = len(ds.latitude)
+        transform = get_transform(ds)
 
         # build binary raster masks for each boundary geometry for spatial aggregation
         masks = build_masks(boundaries, nrows, ncols, transform)
